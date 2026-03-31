@@ -4,19 +4,37 @@ import { useRouter } from "next/navigation";
 
 export default function AddProduct() {
   const [formData, setFormData] = useState({ name: "", sku: "", price: "", quantity: "", category: "General" });
+  const [loading, setLoading] = useState(false); // Loading state එකක් එකතු කළා
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch("/api/products", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
+    setLoading(true);
 
-    if (res.ok) {
-      router.push("/");
-      router.refresh();
+    try {
+      const res = await fetch("/api/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          price: parseFloat(formData.price), // Number එකක් විදිහට යවන්න
+          quantity: parseInt(formData.quantity), // Number එකක් විදිහට යවන්න
+        }),
+      });
+
+      if (res.ok) {
+        alert("Product added successfully! ✅");
+        router.push("/");
+        router.refresh();
+      } else {
+        const errorData = await res.json();
+        alert("Error: " + errorData.error); // Server එකේ error එක පෙන්නන්න
+      }
+    } catch (error) {
+      console.error("Fetch Error:", error);
+      alert("Failed to connect to the server. Please check your internet or database connection.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,8 +87,12 @@ export default function AddProduct() {
           </div>
 
           <div className="pt-6 flex flex-col gap-4">
-            <button type="submit" className="w-full bg-slate-900 text-white p-6 rounded-3xl font-black text-xl hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200 uppercase tracking-widest">
-              Add to Inventory
+            <button 
+              type="submit" 
+              disabled={loading}
+              className={`w-full ${loading ? 'bg-slate-400' : 'bg-slate-900'} text-white p-6 rounded-3xl font-black text-xl hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200 uppercase tracking-widest`}
+            >
+              {loading ? "Adding..." : "Add to Inventory"}
             </button>
             <button type="button" onClick={() => router.push("/")} className="w-full text-slate-400 font-bold hover:text-slate-600 transition-colors py-2 text-sm uppercase tracking-widest">
               Back to Dashboard
