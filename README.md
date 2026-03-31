@@ -1,20 +1,30 @@
-# Smart Inventory Management System 🚀
+# 🚀 Smart Inventory Management System
 
-A modern Inventory Management System built with **Next.js 15**, **Prisma ORM**, and **MySQL**. This application allows users to manage product stocks, track SKUs, and monitor pricing through a clean, responsive dashboard.
+A professional, full-stack inventory control application developed to manage stock levels, product tracking, and business analytics in real-time. This system is built with a focus on speed, reliability, and a modern user experience.
 
-## ✨ Features
-- **Dashboard:** Real-time visualization of inventory status.
-- **Product Management:** Add, Update, and Delete products.
-- **Stock Tracking:** Visual indicators for low-stock items.
-- **Modern UI:** Built with Tailwind CSS for a professional look.
+## 🌟 Key Features
+- **Interactive Dashboard:** Real-time summary of total products, low stock alerts, and total inventory valuation.
+- **Dynamic CRUD Operations:** Full capability to Create, Read, Update, and Delete inventory items.
+- **Intelligent Search:** Instant filtering by Product Name, SKU code, or Category.
+- **Stock Monitoring:** Automated visual indicators for "Low Stock" (Quantity < 5) to prevent inventory shortages.
+- **Premium Dark UI:** A sleek, high-contrast dark-themed interface built with Tailwind CSS for professional use.
 
-## 🛠️ Tech Stack
-- **Framework:** Next.js (App Router)
-- **Database:** MySQL (XAMPP)
-- **ORM:** Prisma
-- **Styling:** Tailwind CSS
+## 🛠️ Technology Stack
+- **Framework:** [Next.js 15+](https://nextjs.org/) (App Router & Turbopack)
+- **Frontend Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **Database ORM:** [Prisma](https://www.prisma.io/)
+- **Database:** SQLite (Local) / PostgreSQL (Production)
+- **State Management:** React Hooks (Context-free efficient state handling)
 
-## 🚀 Getting Started
-1. Clone the repository:
-   ```bash
-   git clone [https://github.com/HashaniMadhushini/Inventory-System.git](https://github.com/HashaniMadhushini/Inventory-System.git)
+## 📂 Project Architecture
+```text
+├── app/
+│   ├── api/products/   # Backend API logic for Inventory
+│   ├── add-product/    # Interface for adding new stock
+│   ├── edit-product/   # Dynamic [id] routes for updating items
+│   └── page.js         # Main Dashboard & Analytics UI
+├── lib/
+│   └── prisma.js       # Centralized Database Client
+├── prisma/
+│   └── schema.prisma   # Data Models & Relationships
+└── public/             # Optimized Static Assets

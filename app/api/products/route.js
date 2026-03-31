@@ -1,23 +1,31 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../../../lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function POST(req) {
   try {
-    const body = await request.json();
-    const { name, sku, price, quantity, category } = body;
-
+    const body = await req.json();
     const newProduct = await prisma.product.create({
       data: {
-        name,
-        sku,
-        price: parseFloat(price),
-        quantity: parseInt(quantity),
-        category: category || "General",
+        name: body.name,
+        sku: body.sku,
+        price: parseFloat(body.price),
+        quantity: parseInt(body.quantity),
+        category: body.category || "General",
       },
     });
-
     return NextResponse.json(newProduct);
   } catch (error) {
-    return NextResponse.json({ error: "Error creating product" }, { status: 500 });
+    return NextResponse.json({ error: "Operation Failed" }, { status: 500 });
+  }
+}
+
+export async function GET() {
+  try {
+    const products = await prisma.product.findMany({
+      orderBy: { createdAt: 'desc' }
+    });
+    return NextResponse.json(products);
+  } catch (error) {
+    return NextResponse.json([]);
   }
 }

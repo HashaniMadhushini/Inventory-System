@@ -1,87 +1,82 @@
 "use client";
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function Dashboard() {
-  const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+export default function AddProduct() {
+  const [formData, setFormData] = useState({ name: "", sku: "", price: "", quantity: "", category: "General" });
+  const router = useRouter();
 
-  const fetchProducts = () => {
-    fetch("/api/products")
-      .then((res) => res.json())
-      .then((data) => setProducts(data));
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const res = await fetch("/api/products", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  // Delete Function එක
-  const handleDelete = async (id) => {
-    if (confirm("Are you sure you want to delete this product?")) {
-      const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        fetchProducts(); // Table එක refresh කරනවා
-      }
+    if (res.ok) {
+      router.push("/");
+      router.refresh();
     }
   };
 
-  const filteredProducts = products.filter((p) =>
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.sku.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
-    <div className="p-8 bg-slate-50 min-h-screen font-sans">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-10">
-          <div>
-            <h1 className="text-4xl font-black text-indigo-600">Inventory Dashboard</h1>
-            <p className="text-slate-500 font-medium italic">Handcrafted by Hashini 👩‍💻</p>
+    <div className="p-8 max-w-2xl mx-auto min-h-screen flex flex-col justify-center">
+      <div className="bg-white p-12 rounded-[3rem] shadow-2xl shadow-slate-200 border border-slate-50">
+        <h1 className="text-4xl font-black text-slate-900 mb-2">New Product</h1>
+        <p className="text-slate-400 mb-10 font-medium">Please enter the details for the new inventory item.</p>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <input
+            type="text" required placeholder="Product Display Name"
+            className="w-full p-5 bg-slate-50 border-none rounded-2xl text-slate-900 font-bold placeholder-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
+          <input
+            type="text" required placeholder="Unique SKU Code"
+            className="w-full p-5 bg-slate-50 border-none rounded-2xl text-slate-900 font-mono font-bold placeholder-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+            onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+          />
+          
+          <select 
+            className="w-full p-5 bg-slate-50 border-none rounded-2xl text-slate-900 font-bold focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
+            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+          >
+            <option value="General">Category: General</option>
+            <option value="Electronics">Category: Electronics</option>
+            <option value="Foods & Beverages">Category: Foods & Beverages</option>
+            <option value="Stationery">Category: Stationery</option>
+            <option value="Apparel">Category: Apparel</option>
+          </select>
+
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest">Price (Rs)</label>
+              <input
+                type="number" required placeholder="0.00"
+                className="w-full p-5 bg-slate-50 border-none rounded-2xl text-slate-900 font-black focus:ring-2 focus:ring-indigo-500 outline-none"
+                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest">Initial Stock</label>
+              <input
+                type="number" required placeholder="0"
+                className="w-full p-5 bg-slate-50 border-none rounded-2xl text-slate-900 font-black focus:ring-2 focus:ring-indigo-500 outline-none"
+                onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+              />
+            </div>
           </div>
-          <Link href="/add-product" className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-all">
-            + Add New Product
-          </Link>
-        </div>
 
-        <input
-          type="text"
-          placeholder="Search by name or SKU..."
-          className="w-full p-4 mb-8 rounded-2xl border-none shadow-md focus:ring-2 focus:ring-indigo-500 outline-none"
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-
-        <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
-          <table className="w-full text-left">
-            <thead className="bg-slate-900 text-white">
-              <tr>
-                <th className="p-5 text-xs font-bold uppercase">Product Name</th>
-                <th className="p-5 text-xs font-bold uppercase">SKU</th>
-                <th className="p-5 text-xs font-bold uppercase">Stock</th>
-                <th className="p-5 text-xs font-bold uppercase">Price</th>
-                <th className="p-5 text-xs font-bold uppercase text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredProducts.map((product) => (
-                <tr key={product.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="p-5 font-bold text-slate-800">{product.name}</td>
-                  <td className="p-5 text-slate-500 font-mono text-sm">{product.sku}</td>
-                  <td className="p-5 font-semibold text-indigo-600">{product.quantity} units</td>
-                  <td className="p-5 font-black text-slate-900">Rs. {product.price}</td>
-                  <td className="p-5 text-center">
-                    <button 
-                      onClick={() => handleDelete(product.id)}
-                      className="bg-rose-100 text-rose-600 px-4 py-2 rounded-lg font-bold hover:bg-rose-600 hover:text-white transition-all"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+          <div className="pt-6 flex flex-col gap-4">
+            <button type="submit" className="w-full bg-slate-900 text-white p-6 rounded-3xl font-black text-xl hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200 uppercase tracking-widest">
+              Add to Inventory
+            </button>
+            <button type="button" onClick={() => router.push("/")} className="w-full text-slate-400 font-bold hover:text-slate-600 transition-colors py-2 text-sm uppercase tracking-widest">
+              Back to Dashboard
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
